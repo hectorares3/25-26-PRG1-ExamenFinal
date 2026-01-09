@@ -2,30 +2,30 @@ import java.util.Scanner;
 
 public class SimuladorCajero {
 
-    
+    // CONSTANTES
     private static final double SALDO_INICIAL_DEFECTO = 1000.0;
     private static final double COMISION_RETIRO = 1.0;
     private static final double LIMITE_DIARIO = 600.0;
     private static final int MAX_HISTORIAL = 10;
     
-    
+    // INDICES
     private static final int I_SALDO = 0;
     private static final int I_RET_HOY = 1;
     
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        
+        // ESTADO
         double[] estadoCuenta = { SALDO_INICIAL_DEFECTO, 0.0 };
-        double[] estadisticas = { 0.0, 0.0, 0.0 }; 
-        int[] contadores = { 0, 0 }; 
+        double[] estadisticas = { 0.0, 0.0, 0.0 }; // [0]Ret, [1]Dep, [2]Com
+        int[] contadores = { 0, 0 }; // [0]Ops, [1]HistIdx
         
         String[] hTipos = new String[MAX_HISTORIAL];
         double[] hMontos = new double[MAX_HISTORIAL];
 
         boolean sesionActiva = true;
 
-        System.out.println("--- PASO 3.1: HELPER HISTORIAL ---");
+        System.out.println("--- COMMIT 1: EXTRAYENDO RETIRO ---");
 
         while (sesionActiva) {
             mostrarMenu();
@@ -36,33 +36,17 @@ public class SimuladorCajero {
                     System.out.printf("Saldo actual: %.2f EUR%n", estadoCuenta[I_SALDO]);
                     break;
                 case 2:
-                    
-                    System.out.print("Cantidad a retirar: ");
-                    double cr = sc.nextDouble();
-                    if (cr > 0 && estadoCuenta[I_RET_HOY] + cr <= LIMITE_DIARIO && estadoCuenta[I_SALDO] >= cr + COMISION_RETIRO) {
-                        estadoCuenta[I_SALDO] -= (cr + COMISION_RETIRO);
-                        estadoCuenta[I_RET_HOY] += cr;
-                        estadisticas[0] += cr;
-                        estadisticas[2] += COMISION_RETIRO;
-                        contadores[0]++;
-                        
-                        
-                        registrarHistorial("Retiro", cr, contadores, hTipos, hMontos);
-                        System.out.println("Retiro OK.");
-                    } else {
-                        System.out.println("Error en retiro.");
-                    }
+                    // CAMBIO: Llamada al nuevo método, lógica extraída
+                    procesarRetiro(sc, estadoCuenta, estadisticas, contadores, hTipos, hMontos);
                     break;
                 case 3:
-                    
+                    // Lógica sucia (se limpiará en el siguiente commit)
                     System.out.print("Cantidad a depositar: ");
                     double cd = sc.nextDouble();
                     if (cd > 0) {
                         estadoCuenta[I_SALDO] += cd;
                         estadisticas[1] += cd;
                         contadores[0]++;
-                        
-                        
                         registrarHistorial("Depósito", cd, contadores, hTipos, hMontos);
                         System.out.println("Depósito OK.");
                     } else {
@@ -113,10 +97,9 @@ public class SimuladorCajero {
         for (int i = 0; i < conts[1]; i++) System.out.printf("%d. %s: %.2f%n", (i+1), hT[i], hM[i]);
     }
 
-    
     private static void registrarHistorial(String tipo, double monto, int[] conts, String[] hT, double[] hM) {
         int idx = conts[1];
-        if (idx == MAX_HISTORIAL) { 
+        if (idx == MAX_HISTORIAL) {
             for (int i = 0; i < MAX_HISTORIAL - 1; i++) {
                 hT[i] = hT[i+1];
                 hM[i] = hM[i+1];
@@ -126,5 +109,22 @@ public class SimuladorCajero {
         hT[idx] = tipo;
         hM[idx] = monto;
         if (conts[1] < MAX_HISTORIAL) conts[1]++;
+    }
+
+    // --- NUEVO MÉTODO DE NEGOCIO ---
+    private static void procesarRetiro(Scanner sc, double[] cuenta, double[] stats, int[] conts, String[] hT, double[] hM) {
+        System.out.print("Cantidad a retirar: ");
+        double cr = sc.nextDouble();
+        if (cr > 0 && cuenta[I_RET_HOY] + cr <= LIMITE_DIARIO && cuenta[I_SALDO] >= cr + COMISION_RETIRO) {
+            cuenta[I_SALDO] -= (cr + COMISION_RETIRO);
+            cuenta[I_RET_HOY] += cr;
+            stats[0] += cr;
+            stats[2] += COMISION_RETIRO;
+            conts[0]++;
+            registrarHistorial("Retiro", cr, conts, hT, hM);
+            System.out.println("Retiro OK.");
+        } else {
+            System.out.println("Error: Fondos insuficientes o límite excedido.");
+        }
     }
 }
