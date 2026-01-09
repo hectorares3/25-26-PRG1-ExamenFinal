@@ -1,0 +1,1 @@
+Soy consciente de que he dejado comentarios en alguno de los commits del proceso ademas de haber usado breaks en procesos intermedios. (Ambas cosas han sido eliminadas durante el proceso de correción y las he usado únicamente como modo de aclaración personal y en el caso de los breaks para que compilara en lo que preparaba la solución )
