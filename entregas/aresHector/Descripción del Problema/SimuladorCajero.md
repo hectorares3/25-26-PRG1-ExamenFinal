@@ -1,0 +1,2 @@
+# Hector Ares, N=3 #
+## Simulador de un cajero automático que gestiona un saldo. Debe permitir las operaciones de consulta, depósito y retiro. Los retiros están sujetos a una comisión y a un límite diario. El sistema debe mantener un historial de transacciones y ofrecer una opción para simular el paso el día siguiente, reiniciando el límite ##
