@@ -2,20 +2,20 @@ import java.util.Scanner;
 
 public class SimuladorCajero {
 
-   
+    
     private static final double SALDO_INICIAL_DEFECTO = 1000.0;
     private static final double COMISION_RETIRO = 1.0;
     private static final double LIMITE_DIARIO = 600.0;
     private static final int MAX_HISTORIAL = 10;
     
-
+    
     private static final int I_SALDO = 0;
     private static final int I_RET_HOY = 1;
     
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-      
+        
         double[] estadoCuenta = { SALDO_INICIAL_DEFECTO, 0.0 };
         double[] estadisticas = { 0.0, 0.0, 0.0 }; 
         int[] contadores = { 0, 0 }; 
@@ -25,49 +25,40 @@ public class SimuladorCajero {
 
         boolean sesionActiva = true;
 
-        System.out.println("--- COMMIT 2: EXTRAYENDO DEPOSITO ---");
+        System.out.println("--- COMMIT 3: ADIOS BREAK/SWITCH ---");
 
         while (sesionActiva) {
             mostrarMenu();
             int opcion = leerOpcion(sc);
 
-            switch (opcion) {
-                case 1:
-                    System.out.printf("Saldo actual: %.2f EUR%n", estadoCuenta[I_SALDO]);
-                    break;
-                case 2:
-                    procesarRetiro(sc, estadoCuenta, estadisticas, contadores, hTipos, hMontos);
-                    break;
-                case 3:
-                   
-                    procesarDeposito(sc, estadoCuenta, estadisticas, contadores, hTipos, hMontos);
-                    break;
-                case 4:
-                    mostrarEstadisticas(estadisticas, contadores);
-                    break;
-                case 5:
-                    System.out.println("Saliendo...");
-                    sesionActiva = false;
-                    break;
-                case 6:
-                    mostrarHistorial(contadores, hTipos, hMontos);
-                    break;
-                case 7:
-                    contadores[1] = 0;
-                    System.out.println("Historial borrado.");
-                    break;
-                case 0:
-                    estadoCuenta[I_RET_HOY] = 0.0;
-                    System.out.println("Día avanzado.");
-                    break;
-                default:
-                    System.out.println("Opción no válida.");
+            
+            if (opcion == 1) {
+                System.out.printf("Saldo actual: %.2f EUR%n", estadoCuenta[I_SALDO]);
+            } else if (opcion == 2) {
+                procesarRetiro(sc, estadoCuenta, estadisticas, contadores, hTipos, hMontos);
+            } else if (opcion == 3) {
+                procesarDeposito(sc, estadoCuenta, estadisticas, contadores, hTipos, hMontos);
+            } else if (opcion == 4) {
+                mostrarEstadisticas(estadisticas, contadores);
+            } else if (opcion == 5) {
+                System.out.println("Saliendo...");
+                sesionActiva = false;
+            } else if (opcion == 6) {
+                mostrarHistorial(contadores, hTipos, hMontos);
+            } else if (opcion == 7) {
+                contadores[1] = 0;
+                System.out.println("Historial borrado.");
+            } else if (opcion == 0) {
+                estadoCuenta[I_RET_HOY] = 0.0;
+                System.out.println("Día avanzado.");
+            } else {
+                System.out.println("Opción no válida.");
             }
         }
         sc.close();
     }
 
- 
+    
     private static void mostrarMenu() {
         System.out.println("\n[1] Saldo | [2] Retiro | [3] Depósito | [4] Stats | [5] Salir | [6] Historial");
         System.out.print(">> ");
@@ -113,7 +104,6 @@ public class SimuladorCajero {
         }
     }
 
-   
     private static void procesarDeposito(Scanner sc, double[] cuenta, double[] stats, int[] conts, String[] hT, double[] hM) {
         System.out.print("Cantidad a depositar: ");
         double cd = sc.nextDouble();
