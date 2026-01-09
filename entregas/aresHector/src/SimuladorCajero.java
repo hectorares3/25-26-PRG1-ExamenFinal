@@ -2,30 +2,30 @@ import java.util.Scanner;
 
 public class SimuladorCajero {
 
-    // CONSTANTES
+   
     private static final double SALDO_INICIAL_DEFECTO = 1000.0;
     private static final double COMISION_RETIRO = 1.0;
     private static final double LIMITE_DIARIO = 600.0;
     private static final int MAX_HISTORIAL = 10;
     
-    // INDICES
+
     private static final int I_SALDO = 0;
     private static final int I_RET_HOY = 1;
     
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
-        // ESTADO
+      
         double[] estadoCuenta = { SALDO_INICIAL_DEFECTO, 0.0 };
-        double[] estadisticas = { 0.0, 0.0, 0.0 }; // [0]Ret, [1]Dep, [2]Com
-        int[] contadores = { 0, 0 }; // [0]Ops, [1]HistIdx
+        double[] estadisticas = { 0.0, 0.0, 0.0 }; 
+        int[] contadores = { 0, 0 }; 
         
         String[] hTipos = new String[MAX_HISTORIAL];
         double[] hMontos = new double[MAX_HISTORIAL];
 
         boolean sesionActiva = true;
 
-        System.out.println("--- COMMIT 1: EXTRAYENDO RETIRO ---");
+        System.out.println("--- COMMIT 2: EXTRAYENDO DEPOSITO ---");
 
         while (sesionActiva) {
             mostrarMenu();
@@ -36,22 +36,11 @@ public class SimuladorCajero {
                     System.out.printf("Saldo actual: %.2f EUR%n", estadoCuenta[I_SALDO]);
                     break;
                 case 2:
-                    // CAMBIO: Llamada al nuevo método, lógica extraída
                     procesarRetiro(sc, estadoCuenta, estadisticas, contadores, hTipos, hMontos);
                     break;
                 case 3:
-                    // Lógica sucia (se limpiará en el siguiente commit)
-                    System.out.print("Cantidad a depositar: ");
-                    double cd = sc.nextDouble();
-                    if (cd > 0) {
-                        estadoCuenta[I_SALDO] += cd;
-                        estadisticas[1] += cd;
-                        contadores[0]++;
-                        registrarHistorial("Depósito", cd, contadores, hTipos, hMontos);
-                        System.out.println("Depósito OK.");
-                    } else {
-                        System.out.println("Error en depósito.");
-                    }
+                   
+                    procesarDeposito(sc, estadoCuenta, estadisticas, contadores, hTipos, hMontos);
                     break;
                 case 4:
                     mostrarEstadisticas(estadisticas, contadores);
@@ -78,25 +67,22 @@ public class SimuladorCajero {
         sc.close();
     }
 
+ 
     private static void mostrarMenu() {
         System.out.println("\n[1] Saldo | [2] Retiro | [3] Depósito | [4] Stats | [5] Salir | [6] Historial");
         System.out.print(">> ");
     }
-
     private static int leerOpcion(Scanner sc) {
         if (sc.hasNextInt()) return sc.nextInt();
         sc.next(); return -1;
     }
-
     private static void mostrarEstadisticas(double[] stats, int[] conts) {
         System.out.println("Ops: " + conts[0] + " | Ret: " + stats[0] + " | Dep: " + stats[1]);
     }
-
     private static void mostrarHistorial(int[] conts, String[] hT, double[] hM) {
         System.out.println("--- HISTORIAL ---");
         for (int i = 0; i < conts[1]; i++) System.out.printf("%d. %s: %.2f%n", (i+1), hT[i], hM[i]);
     }
-
     private static void registrarHistorial(String tipo, double monto, int[] conts, String[] hT, double[] hM) {
         int idx = conts[1];
         if (idx == MAX_HISTORIAL) {
@@ -111,7 +97,6 @@ public class SimuladorCajero {
         if (conts[1] < MAX_HISTORIAL) conts[1]++;
     }
 
-    // --- NUEVO MÉTODO DE NEGOCIO ---
     private static void procesarRetiro(Scanner sc, double[] cuenta, double[] stats, int[] conts, String[] hT, double[] hM) {
         System.out.print("Cantidad a retirar: ");
         double cr = sc.nextDouble();
@@ -125,6 +110,21 @@ public class SimuladorCajero {
             System.out.println("Retiro OK.");
         } else {
             System.out.println("Error: Fondos insuficientes o límite excedido.");
+        }
+    }
+
+   
+    private static void procesarDeposito(Scanner sc, double[] cuenta, double[] stats, int[] conts, String[] hT, double[] hM) {
+        System.out.print("Cantidad a depositar: ");
+        double cd = sc.nextDouble();
+        if (cd > 0) {
+            cuenta[I_SALDO] += cd;
+            stats[1] += cd;
+            conts[0]++;
+            registrarHistorial("Depósito", cd, conts, hT, hM);
+            System.out.println("Depósito OK.");
+        } else {
+            System.out.println("Error: Cantidad inválida.");
         }
     }
 }
