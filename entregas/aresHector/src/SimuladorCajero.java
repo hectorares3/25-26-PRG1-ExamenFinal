@@ -3,21 +3,21 @@ import java.util.Scanner;
 public class SimuladorCajero {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        double s = 1000.0; // saldo
+        double s = 1000.0; 
         double si = s;
-        int n = 0; // num ops
-        double tr = 0; // total retirado
-        double td = 0; // total depositado
+        int n = 0; 
+        double tr = 0; 
+        double td = 0; 
         
-        // Nuevas vars
-        double com = 1.0; // comision
-        double lim_d = 600.0; // limite diario
-        double r_hoy = 0.0; // retirado hoy
-        double com_tot = 0.0; // comisiones
         
-        // Historial
-        String[] hist_t = new String[10]; // tipo
-        double[] hist_m = new double[10]; // monto
+        double com = 1.0; 
+        double lim_d = 600.0; 
+        double r_hoy = 0.0; 
+        double com_tot = 0.0; 
+        
+        
+        String[] hist_t = new String[10]; 
+        double[] hist_m = new double[10]; 
         int hist_idx = 0;
 
         System.out.println("Cajero Automatico - Banco Nacional");
@@ -66,7 +66,7 @@ public class SimuladorCajero {
                 double c = sc.nextDouble();
                 if (c > 0) {
                     s = s + c;
-                    // El total depositado (td) no se actualiza (pendiente corregirlo!!!)
+                    
                     n++;
                     System.out.println("Operacion exitosa. Nuevo saldo: " + s + " euros");
                     if (hist_idx < 10) {
