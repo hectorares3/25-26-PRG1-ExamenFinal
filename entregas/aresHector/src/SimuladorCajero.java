@@ -2,34 +2,35 @@ import java.util.Scanner;
 
 public class SimuladorCajero {
 
-    
     private static final double SALDO_INICIAL_DEFECTO = 1000.0;
     private static final double COMISION_RETIRO = 1.0;
     private static final double LIMITE_DIARIO = 600.0;
     private static final int MAX_HISTORIAL = 10;
 
+  
+    private static final int IDX_SALDO = 0;
+    private static final int IDX_RET_HOY = 1;
+    
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        
-        
-        double saldoActual = SALDO_INICIAL_DEFECTO;
-        double saldoInicialDia = SALDO_INICIAL_DEFECTO;
-        
-        double retiradoHoy = 0.0;
-        double totalRetirado = 0.0;
-        double totalDepositado = 0.0;
-        double totalComisiones = 0.0;
-        int contadorOperaciones = 0;
 
+    
+      
+        double[] estadoCuenta = { SALDO_INICIAL_DEFECTO, 0.0 }; 
         
+        
+        double[] estadisticas = { 0.0, 0.0, 0.0 };
+        
+       
+        int[] contadores = { 0, 0 };
+
         String[] historialTipos = new String[MAX_HISTORIAL];
         double[] historialMontos = new double[MAX_HISTORIAL];
-        int indiceHistorial = 0;
 
-        boolean sesionActiva = true; 
+        boolean sesionActiva = true;
 
-        System.out.println("--- CAJERO ESTRUCTURADO v1 ---");
-        System.out.printf("Saldo inicial: %.2f EUR%n", saldoActual);
+        System.out.println("--- CAJERO ESTRUCTURADO v2 (Arrays) ---");
+        System.out.printf("Saldo inicial: %.2f EUR%n", estadoCuenta[IDX_SALDO]);
 
         while (sesionActiva) {
             System.out.println("\nSELECCIONE OPCION:");
@@ -38,42 +39,42 @@ public class SimuladorCajero {
             System.out.println("[7] Borrar Hist  | [0] Siguiente Dia");
             System.out.print(">> ");
             
-            
             if (!sc.hasNextInt()) {
-                sc.next(); 
-                System.out.println("Error: Entrada no numérica.");
-                continue; 
+                sc.next(); continue;
             }
             int opcion = sc.nextInt();
 
-          
             if (opcion == 1) {
-                System.out.printf("Saldo actual: %.2f EUR%n", saldoActual);
+                
+                System.out.printf("Saldo actual: %.2f EUR%n", estadoCuenta[IDX_SALDO]);
             
             } else if (opcion == 2) {
                 System.out.print("Cantidad a retirar: ");
                 double cantidad = sc.nextDouble();
                 
+                
                 if (cantidad <= 0) {
                     System.out.println("Cantidad inválida.");
-                } else if (retiradoHoy + cantidad > LIMITE_DIARIO) {
+                } else if (estadoCuenta[IDX_RET_HOY] + cantidad > LIMITE_DIARIO) {
                     System.out.println("Error: Límite diario excedido.");
-                } else if (saldoActual < cantidad + COMISION_RETIRO) {
+                } else if (estadoCuenta[IDX_SALDO] < cantidad + COMISION_RETIRO) {
                     System.out.println("Error: Saldo insuficiente.");
                 } else {
-                    saldoActual -= (cantidad + COMISION_RETIRO);
-                    retiradoHoy += cantidad;
-                    totalRetirado += cantidad;
-                    totalComisiones += COMISION_RETIRO;
-                    contadorOperaciones++;
                     
-                   
-                    if (indiceHistorial < MAX_HISTORIAL) {
-                        historialTipos[indiceHistorial] = "Retiro";
-                        historialMontos[indiceHistorial] = cantidad;
-                        indiceHistorial++;
+                    estadoCuenta[IDX_SALDO] -= (cantidad + COMISION_RETIRO);
+                    estadoCuenta[IDX_RET_HOY] += cantidad;
+                    estadisticas[0] += cantidad; 
+                    estadisticas[2] += COMISION_RETIRO; 
+                    contadores[0]++; 
+                    
+                    
+                    int idx = contadores[1]; 
+                    if (idx < MAX_HISTORIAL) {
+                        historialTipos[idx] = "Retiro";
+                        historialMontos[idx] = cantidad;
+                        contadores[1]++; 
                     }
-                    System.out.printf("Retiro exitoso. Nuevo saldo: %.2f EUR%n", saldoActual);
+                    System.out.printf("Retiro exitoso. Nuevo saldo: %.2f EUR%n", estadoCuenta[IDX_SALDO]);
                 }
 
             } else if (opcion == 3) {
@@ -81,47 +82,43 @@ public class SimuladorCajero {
                 double cantidad = sc.nextDouble();
                 
                 if (cantidad > 0) {
-                    saldoActual += cantidad;
-                    totalDepositado += cantidad; 
-                    contadorOperaciones++;
+                    estadoCuenta[IDX_SALDO] += cantidad;
+                    estadisticas[1] += cantidad; 
+                    contadores[0]++;
                     
-                    if (indiceHistorial < MAX_HISTORIAL) {
-                        historialTipos[indiceHistorial] = "Deposito";
-                        historialMontos[indiceHistorial] = cantidad;
-                        indiceHistorial++;
+                    int idx = contadores[1];
+                    if (idx < MAX_HISTORIAL) {
+                        historialTipos[idx] = "Deposito";
+                        historialMontos[idx] = cantidad;
+                        contadores[1]++;
                     }
-                    System.out.printf("Depósito exitoso. Nuevo saldo: %.2f EUR%n", saldoActual);
+                    System.out.printf("Depósito exitoso. Nuevo saldo: %.2f EUR%n", estadoCuenta[IDX_SALDO]);
                 } else {
                     System.out.println("Cantidad inválida.");
                 }
 
             } else if (opcion == 4) {
                 System.out.println("--- ESTADISTICAS ---");
-                System.out.println("Operaciones: " + contadorOperaciones);
-                System.out.printf("Retirado Total: %.2f%n", totalRetirado);
-                System.out.printf("Depositado Total: %.2f%n", totalDepositado);
-                System.out.printf("Comisiones: %.2f%n", totalComisiones);
+                System.out.println("Operaciones: " + contadores[0]);
+                System.out.printf("Retirado Total: %.2f%n", estadisticas[0]);
+                System.out.printf("Depositado Total: %.2f%n", estadisticas[1]);
 
             } else if (opcion == 5) {
-                System.out.println("Cerrando sesión...");
-                sesionActiva = false; 
+                sesionActiva = false;
 
             } else if (opcion == 6) {
                 System.out.println("--- ULTIMOS MOVIMIENTOS ---");
-                for (int i = 0; i < indiceHistorial; i++) {
+                for (int i = 0; i < contadores[1]; i++) {
                     System.out.printf("%d. %s: %.2f EUR%n", (i+1), historialTipos[i], historialMontos[i]);
                 }
 
             } else if (opcion == 7) {
-                indiceHistorial = 0;
+                contadores[1] = 0; 
                 System.out.println("Historial borrado.");
 
             } else if (opcion == 0) {
-                retiradoHoy = 0.0;
-                System.out.println("Día avanzado. Límite restaurado.");
-
-            } else {
-                System.out.println("Opción no reconocida.");
+                estadoCuenta[IDX_RET_HOY] = 0.0; 
+                System.out.println("Día avanzado.");
             }
         }
         sc.close();
